@@ -1,0 +1,35 @@
+<template>
+    <div>
+        <li>
+            <div id="thumbContainer">
+                <a v-on:click="sendEventEnd" style="cursor: pointer;">
+                    <img :src="thumbnailUrl">
+                    <span>{{itemName}}</span>
+                    <span>
+                        <!--<a :href="itemUrl" target="_blank">Visit URL</a>-->
+                    </span>
+                </a>
+            </div>
+        </li>
+    </div>
+</template>
+
+<script>
+export default {
+    props: ['thumbnailUrl','itemName','itemUrl'],
+    methods: {
+            sendEventEnd: function () {
+                    this.$parent.customEnd()
+            }
+    },
+    data:()=>({
+        greet:'hello'
+    }),
+    created(){
+        console.log(this.greet)
+    }
+}
+</script>
+
+<style lang="scss">
+</style>
