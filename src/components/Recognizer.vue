@@ -1,9 +1,9 @@
 <template>
-    <div class="container hero is-fullheight">
+    <div class="hero is-fullheight">
         <!--<button @click="customStart">customStart</button>
         <button @click="customParticipate">customParticipate</button>
         <button @click="customEnd">customEnd</button>-->
-        <form action="#" method="post" accept-charset="utf-8">
+        <form class="container" action="#" method="post" accept-charset="utf-8">
             <div id="videoCapture" ref="videoCapture"></div>
             <input id="scan" ref="scan" type="button" class="button is-primary pt-main-button" value="Start scanning">
             <input id="selectorElement" type="file" accept="image/*" value="Select an image" class="is-invisible button is-primary pt-main-button" name="ir">
@@ -30,11 +30,9 @@ export default {
         
     },
     mounted(){
-        {{debugger}}
+
         var scanButton = document.getElementById('scan')
         //var spinnerElement = document.getElementById('spinner')
-
-        var spinnerElement = this.$refs.spinner
 
         if ( craftar.supportsCapture() ){
             let that = this
@@ -46,11 +44,17 @@ export default {
                     that.switchToSelector()
                 } else {
 
-                    var captureDivElement = document.getElementById( 'videoCapture' )
+                    /*var captureDivElement = document.getElementById( 'videoCapture' )
                     captureDivElement.appendChild( captureObject.domElement )
-                    that.setCaptureResultsListener()
+                    that.setCaptureResultsListener()*/
                     
                     scanButton.addEventListener( 'click', () => {
+                        var captureDivElement = document.getElementById( 'videoCapture' )
+                        captureDivElement.appendChild( captureObject.domElement )
+                        this.setCaptureResultsListener()
+                        {{debugger}}
+                        console.log("aa");
+                        var spinnerElement = this.$refs.spinner
                         spinnerElement.setAttribute("class", "spinner")
                         this.finderResults = false
                         this.cloudRecognition.startFinder( captureObject, 2000, 3)
@@ -67,6 +71,17 @@ export default {
         }
     },
     methods:{
+        beginScanning(){
+            var captureDivElement = document.getElementById( 'videoCapture' )
+            captureDivElement.appendChild( captureObject.domElement )
+            this.setCaptureResultsListener()
+            {{debugger}}
+            console.log("aa");
+            var spinnerElement = this.$refs.spinner
+            spinnerElement.setAttribute("class", "spinner")
+            this.finderResults = false
+            this.cloudRecognition.startFinder( captureObject, 2000, 3)
+        },
         scanAction(){
             spinnerElement.setAttribute("class", "spinner")
             this.finderResults = false
