@@ -1,14 +1,14 @@
 <template>
-    <div class="hero is-fullheight">
+    <div>
         <!--<button @click="customStart">customStart</button>
         <button @click="customParticipate">customParticipate</button>
         <button @click="customEnd">customEnd</button>-->
         <form class="container" action="#" method="post" accept-charset="utf-8">
-            <div id="videoCapture" ref="videoCapture"></div>
-            <input id="scan" ref="scan" type="button" class="button is-primary pt-main-button" value="Start scanning">
-            <input id="selectorElement" type="file" accept="image/*" value="Select an image" class="is-invisible button is-primary pt-main-button" name="ir">
+            <div v-if="showScanner" id="videoCapture" ref="videoCapture"></div>
+            <input v-if="captureObject" @click="beginScanning" id="scan" ref="scan" type="button" class="button is-primary pt-main-button" value="Start scanning">
+            <input v-else id="selectorElement" type="file" accept="image/*" value="Select an image" class="is-invisible is-primary pt-main-button" name="ir">
         </form>	
-        <div class="spinner is-invisible" id="spinner" ref="spinner"><img src="../assets/images/spinner.gif"></div>
+        <div class="loader spinner is-invisible" id="spinner" ref="spinner"></div>
     </div>
 </template>
 
@@ -19,9 +19,11 @@ export default {
     methods: {
     },
     data:()=>({
-        greet:'hello',
         finderResults: false,
-        cloudRecognition: null
+        cloudRecognition: null,
+        captureObject: null,
+        showScanner: true,
+        capturerInitialized: false
     }),
     created(){
         this.cloudRecognition =  new craftar.CloudRecognition({
@@ -30,9 +32,7 @@ export default {
         
     },
     mounted(){
-
         var scanButton = document.getElementById('scan')
-        //var spinnerElement = document.getElementById('spinner')
 
         if ( craftar.supportsCapture() ){
             let that = this
@@ -43,22 +43,7 @@ export default {
                     // switch to selector mode
                     that.switchToSelector()
                 } else {
-
-                    /*var captureDivElement = document.getElementById( 'videoCapture' )
-                    captureDivElement.appendChild( captureObject.domElement )
-                    that.setCaptureResultsListener()*/
-                    
-                    scanButton.addEventListener( 'click', () => {
-                        var captureDivElement = document.getElementById( 'videoCapture' )
-                        captureDivElement.appendChild( captureObject.domElement )
-                        this.setCaptureResultsListener()
-                        {{debugger}}
-                        console.log("aa");
-                        var spinnerElement = this.$refs.spinner
-                        spinnerElement.setAttribute("class", "spinner")
-                        this.finderResults = false
-                        this.cloudRecognition.startFinder( captureObject, 2000, 3)
-                    });
+                    this.captureObject = captureObject        
                 }
 
             });
@@ -72,20 +57,22 @@ export default {
     },
     methods:{
         beginScanning(){
+            this.showScanner = true
             var captureDivElement = document.getElementById( 'videoCapture' )
-            captureDivElement.appendChild( captureObject.domElement )
-            this.setCaptureResultsListener()
-            {{debugger}}
-            console.log("aa");
+            captureDivElement.appendChild(this.captureObject.domElement)
+            if (!this.capturerInitialized){
+                this.setCaptureResultsListener()
+                this.capturerInitialized = true
+            }
             var spinnerElement = this.$refs.spinner
-            spinnerElement.setAttribute("class", "spinner")
+            spinnerElement.setAttribute("class", "loader spinner")
             this.finderResults = false
-            this.cloudRecognition.startFinder( captureObject, 2000, 3)
+            this.cloudRecognition.startFinder(this.captureObject, 2000, 3)
         },
         scanAction(){
-            spinnerElement.setAttribute("class", "spinner")
+            spinnerElement.setAttribute("class", "loader spinner")
             this.finderResults = false
-            this.cloudRecognition.startFinder( captureObject, 2000, 3)
+            this.cloudRecognition.startFinder(this.captureObject, 2000, 3)
         },
         switchToSelector() {
             var scanButton = document.getElementById('scan');
@@ -102,7 +89,7 @@ export default {
 
             var selector = new craftar.ImageSelector(selectorElement);
             selector.addListener('image', (craftarImage) => {
-                spinnerElement.setAttribute("class", "spinner");
+                spinnerElement.setAttribute("class", "loader spinner");
                 this.cloudRecognition.search(craftarImage);
             });
             {{debugger}}
@@ -134,7 +121,7 @@ export default {
         setSelectorResultsListener() {
             this.cloudRecognition.addListener('results', function(error, results, xhr) {
                 var spinnerElement = document.getElementById('spinner');
-                spinnerElement.setAttribute("class", "spinner is-invisible");
+                spinnerElement.setAttribute("class", "loader spinner is-invisible");
 
                 if (results.results && results.results.length > 0) {
                     this.renderResults( results );
@@ -152,15 +139,16 @@ export default {
                     this.renderResults( results );
                     this.cloudRecognition.stopFinder();
                     var spinnerElement = document.getElementById('spinner');
-                    spinnerElement.setAttribute("class", "spinner is-invisible");
+                    spinnerElement.setAttribute("class", "loader spinner is-invisible");
                 }
             });
 
             this.cloudRecognition.addListener('finderFinished', () => {
                 var spinnerElement = document.getElementById('spinner');
-                spinnerElement.setAttribute("class", "spinner is-invisible");
+                spinnerElement.setAttribute("class", "loader spinner is-invisible");
                 if (!this.finderResults) {
                     alert("No results found, point to an object.");
+                    this.showScanner = false
                 }
             });
         },
@@ -192,11 +180,18 @@ export default {
             this.$emit('input', results.results)
             debugger;
             this.$parent.recognizedItems = Array.from(results.results)
-            
+            this.showScanner = false
         }
     }
 }
 </script>
 
-<style lang="scss">
+<style>
+#spinner {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    width: 20px;
+    height: 0px;
+}
 </style>

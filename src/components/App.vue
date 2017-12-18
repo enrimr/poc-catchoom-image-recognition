@@ -1,10 +1,15 @@
 <template>
-    <div>
-        <recognizer></recognizer>
-        <div class="center">
-            <ul class="ir" ref="resultList" v-for="result in recognizedItems" :key='result.item.name'>
-                <recognized-item :thumbnail-url="result.image.thumb_120" :item-name="result.item.name" :item-url="result.item.url"></recognized-item>
-            </ul>
+    <div class="hero is-fullheight">
+        <div>
+            <div v-if="recognizedItems">
+                <div v-if="showList" class="text-content container">
+                    <h2 class="subtitle is-5">Is this your product?</h2>
+                    <ul class="ir" ref="resultList" v-for="result in recognizedItems" :key='result.item.name'>
+                        <recognized-item :thumbnail-url="result.image.thumb_120" :item-name="result.item.name" :item-url="result.item.url"></recognized-item>
+                    </ul>
+                </div>
+            </div>
+            <recognizer v-else></recognizer>
         </div>
     </div>
 </template>
@@ -21,12 +26,13 @@ import Recognizer from './Recognizer'
 export default {
     data:()=>({
         greet:'hello',
-        recognizedItems: [],
+        recognizedItems: null,
         messageTypes: {
             ORCHEXTRA_PROMOTOOL_START: 'orchextraPromotoolStart',
             ORCHEXTRA_PROMOTOOL_PARTICIPATE: 'orchextraPromotoolParticipate',
             ORCHEXTRA_PROMOTOOL_END: 'orchextraPromotoolEnd'
-        }
+        },
+        showList: true
     }),
     created(){
         console.log(this.greet)
@@ -45,7 +51,6 @@ export default {
             window.top.postMessage({type: this.messageTypes.ORCHEXTRA_PROMOTOOL_PARTICIPATE},'*')
         },
         customEnd(){
-            {{debugger}}
             window.top.postMessage({type: this.messageTypes.ORCHEXTRA_PROMOTOOL_END},'*')
         },
         makeRequest(method, url) {

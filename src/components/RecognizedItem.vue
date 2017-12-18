@@ -2,7 +2,7 @@
     <div>
         <li>
             <div id="thumbContainer">
-                <a v-on:click="sendEventEnd" style="cursor: pointer;">
+                <a @click="sendEventParticipate" style="cursor: pointer;">
                     <img :src="thumbnailUrl">
                     <span>{{itemName}}</span>
                     <span>
@@ -18,12 +18,25 @@
 export default {
     props: ['thumbnailUrl','itemName','itemUrl'],
     methods: {
+            sendEventParticipate: function () {
+                    //this.$parent.customEnd()
+                    window.top.postMessage({type: this.messageTypes.ORCHEXTRA_PROMOTOOL_PARTICIPATE},'*')
+                    this.$parent.showList = false
+                    this.sendEventEnd()
+            },
             sendEventEnd: function () {
-                    this.$parent.customEnd()
+                    //this.$parent.customEnd()
+                    window.top.postMessage({type: this.messageTypes.ORCHEXTRA_PROMOTOOL_END},'*')
             }
+
     },
     data:()=>({
-        greet:'hello'
+        greet:'hello',
+        messageTypes: {
+            ORCHEXTRA_PROMOTOOL_START: 'orchextraPromotoolStart',
+            ORCHEXTRA_PROMOTOOL_PARTICIPATE: 'orchextraPromotoolParticipate',
+            ORCHEXTRA_PROMOTOOL_END: 'orchextraPromotoolEnd'
+        }
     }),
     created(){
         console.log(this.greet)
@@ -32,4 +45,5 @@ export default {
 </script>
 
 <style lang="scss">
+
 </style>
