@@ -25,7 +25,6 @@ import Recognizer from './Recognizer'
 
 export default {
     data:()=>({
-        greet:'hello',
         recognizedItems: null,
         messageTypes: {
             ORCHEXTRA_PROMOTOOL_START: 'orchextraPromotoolStart',
@@ -35,7 +34,6 @@ export default {
         showList: true
     }),
     created(){
-        console.log(this.greet)
         this.useCases().sendEventStart()
         this.useCases().initPromotionConfiguration()
     },
