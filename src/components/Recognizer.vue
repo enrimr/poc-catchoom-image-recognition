@@ -51,8 +51,9 @@ export default {
         if ( craftar.supportsCapture() ){
             let that = this
             this.setupCapture((err, captureObject) => {
-
+                console.log("mounted > this.setupCapture")
                 if (err){
+                    console.log("mounted > err", err)
                     // Capture setup failed (user rejected to open the camera)
                     // switch to selector mode
                     that.switchToSelector()
@@ -96,11 +97,8 @@ export default {
             this.cloudRecognition.startFinder(this.captureObject, 2000, 3)
         },
         switchToSelector() {
+            console.log("switchToSelector")
             var spinnerElement = document.getElementById('spinner');
-
-            /*$("#selectorElement").prettyfile({
-                html: "Choose an image"
-            });*/
 
             var selector = new craftar.ImageSelector(selectorElement);
             selector.addListener('image', (craftarImage) => {
@@ -111,18 +109,21 @@ export default {
             this.setSelectorResultsListener()
         },
 
-        setupCapture( callback ){
-
+        setupCapture(callback){
+            console.log("setupCapture", callback)
             var capture = new craftar.Capture();
-
-            capture.addListener('started', function(){
-                callback( null, capture )
+            console.log("setupCapture > 2")
+            {{debugger}}
+            capture.addListener('started', () => {
+                console.log("setupCapture > 3")
+                callback(null, capture )
             })
 
-            capture.addListener('error', function( error ){
-                callback( error, capture )
+            capture.addListener('error', (error) => {
+                console.log("setupCapture > 4")
+                callback(error, capture)
             })
-
+            console.log("setupCapture > 5")
             capture.start()
         },
 
