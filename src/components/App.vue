@@ -5,7 +5,11 @@
                 <div v-if="showList" class="text-content container">
                     <h2 class="subtitle is-5">Is this your product?</h2>
                     <ul class="ir" ref="resultList" v-for="result in recognizedItems" :key='result.item.name'>
-                        <recognized-item :thumbnail-url="result.image.thumb_120" :item-name="result.item.name" :item-url="result.item.url"></recognized-item>
+                        <recognized-item 
+                            :thumbnail-url="result.image.thumb_120" 
+                            :item-name="result.item.name" 
+                            :item-url="result.item.url"
+                            :item-recognition-rate="result.item.score"></recognized-item>
                     </ul>
                 </div>
             </div>

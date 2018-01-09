@@ -4,7 +4,7 @@
             <div id="thumbContainer">
                 <a @click="sendEventParticipate" style="cursor: pointer;">
                     <img :src="thumbnailUrl">
-                    <span>{{itemName}}</span>
+                    <span>{{itemName}}</span><span>[{{itemRecognitionRate}}]</span>
                     <span>
                         <!--<a :href="itemUrl" target="_blank">Visit URL</a>-->
                     </span>
@@ -16,7 +16,7 @@
 
 <script>
 export default {
-    props: ['thumbnailUrl','itemName','itemUrl'],
+    props: ['thumbnailUrl','itemName','itemUrl','itemRecognitionRate'],
     methods: {
             sendEventParticipate: function () {
                     //this.$parent.customEnd()
