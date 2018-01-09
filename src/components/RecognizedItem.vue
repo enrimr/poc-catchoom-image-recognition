@@ -19,8 +19,7 @@ export default {
     props: ['thumbnailUrl','itemName','itemUrl','itemRecognitionRate'],
     methods: {
             sendEventParticipate: function () {
-                    //this.$parent.customEnd()
-                    window.top.postMessage({type: this.messageTypes.ORCHEXTRA_PROMOTOOL_PARTICIPATE},'*')
+                    //window.top.postMessage({type: this.messageTypes.ORCHEXTRA_PROMOTOOL_PARTICIPATE},'*')
                     this.$parent.showList = false
                     this.sendEventEnd()
             },
