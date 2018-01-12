@@ -9,7 +9,7 @@
                             :thumbnail-url="result.image.thumb_120" 
                             :item-name="result.item.name" 
                             :item-url="result.item.url"
-                            :item-recognition-rate="result.item.score"></recognized-item>
+                            :item-score="result.score"></recognized-item>
                     </ul>
                 </div>
             </div>
@@ -78,7 +78,7 @@ export default {
                 xhr.send();
             });
         },
-        includeCSS(promoId){
+        includeCSS(promoId, apiUrl){
             var cssId = 'orchextraCss';  // you could encode the css path itself to generate id..
             if (!document.getElementById(cssId))
             {
@@ -87,10 +87,15 @@ export default {
                 link.id   = cssId;
                 link.rel  = 'stylesheet';
                 link.type = 'text/css';
-                link.href = 'https://front-pt.orchextra.io/_template/'+promoId;
+                link.href = 'https://front-'+apiUrl+'/_template/'+promoId;
                 link.media = 'all';
                 head.appendChild(link);
             }
+        },
+        cleanUrl(url){
+            console.log(url)
+            console.log(url.replace(/(^\w+:|^)\/\//, ''))
+            return url.replace(/(^\w+:|^)\/\//, '')
         },
         useCases(){
             return {
@@ -102,14 +107,15 @@ export default {
                             var value = chunks[1];
                             return (q[key] = value, q);
                     }, {});
-                    this.promoId = queryParams['promoId'];
-                    this.lang = queryParams['lang'] || 'en';
+                    this.promoId = queryParams['promoId']
+                    this.lang = queryParams['lang'] || 'en'
+                    this.apiUrl = this.cleanUrl(queryParams['apiUrl']) || 'pt.orchextra.io'
                     //this.promoId = new URLSearchParams(window.location.search).get('promoId')
                     console.log('promoId', this.promoId)
                     //this.lang = new URLSearchParams(window.location.search).get('lang')
-                    this.makeRequest('GET','https://pt.orchextra.io/configuration/'+this.promoId).then((response) => {
+                    this.makeRequest('GET','https://'+this.apiUrl+'/configuration/'+this.promoId).then((response) => {
                         this.promoConfiguration = response
-                        this.includeCSS(this.promoId)
+                        this.includeCSS(this.promoId, this.apiUrl)
                     }).catch((error) => {
                             throw new Error(error.statusText)
                         })
