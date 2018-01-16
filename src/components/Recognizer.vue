@@ -8,7 +8,7 @@
         <!--<form class="container" action="#" method="post" accept-charset="utf-8">-->
         <div class="container">
             <div v-if="showButtonScanner">
-                <button v-if="captureObject" @click="beginScanning" id="scan" ref="scan" class="button is-primary pt-main-button">Start scanning</button>
+                <button v-if="captureObject" @click="beginScanning" id="scan" ref="scan" class="button is-primary pt-main-button">{{buttonScanText}}</button>
                 <!--<input v-if="captureObject" @click="beginScanning" id="scan" ref="scan" type="button" class="button is-primary pt-main-button" value="Start scanning">-->
                 <!--<input v-else id="selectorElement" type="file" accept="image/*" value="Select an image" class="is-primary pt-main-button" name="ir"> -->
                 <div v-else id="selectorElement">
@@ -42,6 +42,7 @@ export default {
         isButtonDisabled: false,
         isFirstTime: true
     }),
+    props: ['buttonScanText'],
     components: {
         UploadFile
     },

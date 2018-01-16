@@ -1,19 +1,22 @@
 <template>
     <div class="hero is-fullheight">
-        <div>
-            <div v-if="recognizedItems">
-                <div v-if="showList" class="text-content container">
-                    <h2 class="subtitle is-5">Is this your product?</h2>
-                    <ul class="ir" ref="resultList" v-for="result in recognizedItems" :key='result.item.name'>
-                        <recognized-item 
-                            :thumbnail-url="result.image.thumb_120" 
-                            :item-name="result.item.name" 
-                            :item-url="result.item.url"
-                            :item-score="result.score"></recognized-item>
-                    </ul>
+        <div v-if="error"><h2 style="color: red;">Oops! Some error ocurred :(</h2></div>
+        <div v-else>
+            <div>
+                <div v-if="recognizedItems">
+                    <div v-if="showList" class="text-content container">
+                        <h2 class="subtitle is-5">Is this your product?</h2>
+                        <ul class="ir" ref="resultList" v-for="result in recognizedItems" :key='result.item.name'>
+                            <recognized-item 
+                                :thumbnail-url="result.image.thumb_120" 
+                                :item-name="result.item.name" 
+                                :item-url="result.item.url"
+                                :item-score="result.score"></recognized-item>
+                        </ul>
+                    </div>
                 </div>
+                <recognizer v-else :buttonScanText='buttonText'></recognizer>
             </div>
-            <recognizer v-else></recognizer>
         </div>
     </div>
 </template>
@@ -29,6 +32,10 @@ import Recognizer from './Recognizer'
 
 export default {
     data:()=>({
+        error: null,
+        promoConfiguration: null,
+        language: 'en',
+        promoId: null,
         recognizedItems: null,
         messageTypes: {
             ORCHEXTRA_PROMOTOOL_START: 'orchextraPromotoolStart',
@@ -38,8 +45,14 @@ export default {
         showList: true
     }),
     created(){
-        this.useCases().sendEventStart()
-        this.useCases().initPromotionConfiguration()
+        this.useCases().sendEventStart(this)
+        this.useCases().initPromotionConfiguration(this)
+    },
+    computed: {
+        buttonText(){
+            console.log("LANG", this.language)
+            return this.promoConfiguration && this.promoConfiguration.data.template.iframeContent.button[this.language]
+        }
     },
     components: {
         RecognizedItem,
@@ -94,28 +107,37 @@ export default {
         },
         cleanUrl(url){
             console.log(url)
-            console.log(url.replace(/(^\w+:|^)\/\//, ''))
-            return url.replace(/(^\w+:|^)\/\//, '')
+            if (url) {
+                console.log(url.replace(/(^\w+:|^)\/\//, ''))
+                return url.replace(/(^\w+:|^)\/\//, '')
+            }
+            return null
         },
         useCases(){
             return {
-                initPromotionConfiguration: () => {
-                    this.messageTypes = {};
+                initPromotionConfiguration: (context) => {
+                    this.messageTypes = {}
                     var queryParams = window.location.search.substr(1).split('&').reduce(function (q, query) {
-                            var chunks = query.split('=');
-                            var key = chunks[0];
-                            var value = chunks[1];
-                            return (q[key] = value, q);
-                    }, {});
-                    this.promoId = queryParams['promoId']
-                    this.lang = queryParams['lang'] || 'en'
-                    this.apiUrl = this.cleanUrl(queryParams['apiUrl']) || 'pt.orchextra.io'
+                            var chunks = query.split('=')
+                            var key = chunks[0]
+                            var value = chunks[1]
+                            return (q[key] = value, q)
+                    }, {})
+                    context.promoId = queryParams['promoId']
+                    if (!context.promoId){
+                        let errorText = 'No promoId specified'
+                        {{debugger}}
+                        context.error = true
+                        throw new ReferenceError(errorText)
+                    }
+                    context.language = queryParams['lang'] || 'en'
+                    context.apiUrl = this.cleanUrl(queryParams['apiUrl']) || 'pt.orchextra.io'
                     //this.promoId = new URLSearchParams(window.location.search).get('promoId')
-                    console.log('promoId', this.promoId)
+                    console.log('promoId', context.promoId)
                     //this.lang = new URLSearchParams(window.location.search).get('lang')
-                    this.makeRequest('GET','https://'+this.apiUrl+'/configuration/'+this.promoId).then((response) => {
-                        this.promoConfiguration = response
-                        this.includeCSS(this.promoId, this.apiUrl)
+                    this.makeRequest('GET','https://'+context.apiUrl+'/configuration/'+context.promoId).then((response) => {
+                        context.promoConfiguration = JSON.parse(response)
+                        this.includeCSS(context.promoId, context.apiUrl)
                     }).catch((error) => {
                             throw new Error(error.statusText)
                         })
